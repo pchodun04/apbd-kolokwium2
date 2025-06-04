@@ -27,7 +27,7 @@ public class DatabaseContext : DbContext
          modelBuilder.Entity<Customer>().HasData(new List<Customer>()
         {
             new Customer() { Id = 1, FirstName = "John", LastName = "Doe", PhoneNumber = "123456789" },
-            new Customer() { Id = 2, FirstName = "Jane", LastName = "Doe", PhoneNumber = null},
+            new Customer() { Id = 2, FirstName = "Jane", LastName = "Doe", PhoneNumber = "123456789"},
             new Customer() { Id = 3, FirstName = "Julie", LastName = "Doe", PhoneNumber = "987654321" },
         });
 
