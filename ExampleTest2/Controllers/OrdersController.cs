@@ -17,17 +17,21 @@ public class OrdersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetOrders(int OrderId)
+    public async Task<IActionResult> GetOrders(int customerId)
     {
-        var order =  await _dbService.GetOrder(OrderId);
-        return Ok(order);
+        try
+        {
+            var order =  await _dbService.GetOrder(customerId);
+            return Ok(order);
+        }
+        catch (NotFoundException e)
+        {
+            return NotFound();
+        }
+        
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutOrders(int orderId, FulfillOrderDto fulfillOrderDto)
-    {
-        await _dbService.FulfillOrder(orderId, fulfillOrderDto);
-        return Ok();
-    }
+    
+    
     
 }

@@ -2,6 +2,7 @@ using System.Data;
 using ExampleTest2.Data;
 using ExampleTest2.DTOs;
 using ExampleTest2.Exceptions;
+using ExampleTest2.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExampleTest2.Services;
@@ -14,27 +15,32 @@ public class DbService : IDbService
     {
         _context = context;
     }
-    public async Task<OrderDto> GetOrder(int orderId)
+    public async Task<OrderDto> GetOrder(int customerId)
     {
-        var order = await _context.Orders
+        var order = await _context.Customers
             .Select(e => new OrderDto
         {
             Id = e.Id,
-            CreatedAt = e.CreatedAt,
-            FulfilledAt = e.FulfilledAt,
-            Status = e.Status.Name,
-            ClientDto = new ClientDto()
+            FirstName = e.FirstName,
+            LastName = e.LastName,
+            PhoneNumber = e.PhoneNumber,
+            Purchases = e.PurchasedTickets.Select(s => new PurchaseDto()
             {
-                FirstName = e.Client.FirstName,
-                LastName = e.Client.LastName,
-            },
-            Products = e.ProductOrders.Select(e => new ProductDto()
-            {
-                ProductName = e.Product.Name,
-                Price = e.Product.Price,
-                Amount = e.Amount
+                PurchaseDate = s.PurchaseDate,
+                Price = s.TicketConcert.Price,
+                Ticket = new TicketDto()
+                {
+                    SerialNumber = s.TicketConcert.Ticket.SerialNumber,
+                    SeatNumber = s.TicketConcert.Ticket.SeatNumber
+                },
+                Concert = new ConcertDto()
+                {
+                    Name = s.TicketConcert.Concert.Name,
+                    Date = s.TicketConcert.Concert.Date,
+                }
+                
             }).ToList()
-        }).FirstOrDefaultAsync(e => e.Id == orderId);
+        }).FirstOrDefaultAsync(e => e.Id == customerId);
 
         if (order is null)
         {
@@ -43,45 +49,18 @@ public class DbService : IDbService
         return order;
     }
 
-    public async Task FulfillOrder(int orderId, FulfillOrderDto fulfillOrderDto)
+    public async Task<bool> DoesCustomerExist(int customerId)
     {
-        using var transaction = await _context.Database.BeginTransactionAsync();
+        return await _context.Customers.AnyAsync(e => e.Id == customerId);
+    }
 
-        try
-        {
-            var order = await _context.Orders.FirstOrDefaultAsync(e => e.Id == orderId);
+    public async Task<bool> DoesConcertExist(string concertName)
+    {
+        return await _context.Concerts.AnyAsync(e => e.Name == concertName);
+    }
 
-            if (order is null)
-            {
-                throw new NotFoundException("Order not found");
-            }
-            
-            var status = await _context.Statuses.FirstOrDefaultAsync(e => e.Name.Equals(fulfillOrderDto.StatusName));
-
-            if (status is null)
-            {
-                throw new NotFoundException("Status not found");
-            }
-
-            if (order.FulfilledAt != null)
-            {
-                throw new ConflictException("Order already fulfilled");
-            }
-            
-            order.StatusId = status.Id;
-            order.FulfilledAt = DateTime.Now;
-            
-            var relatedProducts = _context.ProductOrders.Where(e => e.OrderId == orderId);
-            _context.ProductOrders.RemoveRange(relatedProducts);
-            
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-
-        }
-        catch (Exception e)
-        {
-            await transaction.RollbackAsync();
-            throw e;
-        }
+    public async Task<bool> DoesCustomerHasMoreThan5Tickets(int customerId)
+    {
+        return await _context.PurchasedTickets.CountAsync(e => e.CustomerId == customerId) > 5;
     }
 }

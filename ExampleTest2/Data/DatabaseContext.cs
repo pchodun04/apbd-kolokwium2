@@ -14,54 +14,49 @@ public class DatabaseContext : DbContext
     {
         
     }
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<Client> Clients { get; set; }
-    public DbSet<Product> Products { get; set; }
-    public DbSet<ProductOrder> ProductOrders { get; set; }
-    public DbSet<Status> Statuses { get; set; }
+    public DbSet<Ticket> Tickets { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<PurchasedTicket> PurchasedTickets { get; set; }
+    public DbSet<TicketConcert> TicketConcerts { get; set; }
+    public DbSet<Concert> Concerts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-         modelBuilder.Entity<Client>().HasData(new List<Client>()
+         modelBuilder.Entity<Customer>().HasData(new List<Customer>()
         {
-            new Client() { Id = 1, FirstName = "John", LastName = "Doe" },
-            new Client() { Id = 2, FirstName = "Jane", LastName = "Doe" },
-            new Client() { Id = 3, FirstName = "Julie", LastName = "Doe" },
+            new Customer() { Id = 1, FirstName = "John", LastName = "Doe", PhoneNumber = "123456789" },
+            new Customer() { Id = 2, FirstName = "Jane", LastName = "Doe", PhoneNumber = null},
+            new Customer() { Id = 3, FirstName = "Julie", LastName = "Doe", PhoneNumber = "987654321" },
         });
 
-        modelBuilder.Entity<Status>().HasData(new List<Status>()
+        modelBuilder.Entity<Concert>().HasData(new List<Concert>()
         {
-            new  Status(){Id = 1, Name = "Active"},
-            new  Status(){Id = 2, Name = "Inactive"},
-            new  Status(){Id = 2, Name = "Pending"}
+            new  Concert(){Id = 1, Name = "Concert 1", Date = DateTime.Parse("2025-05-01"), AvaiableTickets = 100},
+            new  Concert(){Id = 2, Name = "Concert 2", Date = DateTime.Parse("2025-05-02"), AvaiableTickets = 200}, 
+            new  Concert(){Id = 3, Name = "Concert 3", Date = DateTime.Parse("2025-05-03"), AvaiableTickets = 300},
         });
 
-        modelBuilder.Entity<Product>().HasData(new List<Product>()
+        modelBuilder.Entity<PurchasedTicket>().HasData(new List<PurchasedTicket>()
         {
-            new Product(){Id = 1, Name = "Apple", Price = 100},
-            new Product(){Id = 2, Name = "Orange", Price = 100},
-            new Product(){Id = 3, Name = "Pear", Price = 100},
-            new Product(){Id = 4, Name = "Pineapple", Price = 100}
+            new PurchasedTicket(){TicketConcertId = 1, CustomerId = 1, PurchaseDate = DateTime.Parse("2025-05-04")},
+            new PurchasedTicket(){TicketConcertId = 2, CustomerId = 2, PurchaseDate = DateTime.Parse("2025-05-05")},
+            new PurchasedTicket(){TicketConcertId = 3, CustomerId = 3, PurchaseDate = DateTime.Parse("2025-05-06")}
         });
         
-        modelBuilder.Entity<Order>().HasData(new List<Order>()
+        modelBuilder.Entity<Ticket>().HasData(new List<Ticket>()
         {
-            new Order() { Id = 1, CreatedAt = DateTime.Parse("2025-05-01"), FulfilledAt = DateTime.Parse("2025-05-02"), ClientId = 1, StatusId = 3},
-            new Order() { Id = 2, CreatedAt = DateTime.Parse("2025-05-02"), FulfilledAt = null, ClientId = 1, StatusId = 2},
-            new Order() { Id = 3, CreatedAt = DateTime.Parse("2025-05-03"), FulfilledAt = null, ClientId = 1, StatusId = 1}
+            new Ticket() { Id = 1, SerialNumber = "TK2034/S4531/12", SeatNumber = 1},
+            new Ticket() { Id = 2, SerialNumber = "TK2027/S4831/133", SeatNumber = 2},
+            new Ticket() { Id = 3, SerialNumber = "TK2032/S4121/139", SeatNumber = 3},
         });
         
-        modelBuilder.Entity<ProductOrder>().HasData(new List<ProductOrder>()
+        modelBuilder.Entity<TicketConcert>().HasData(new List<TicketConcert>()
         {
-            new ProductOrder() { ProductId = 1, OrderId = 1, Amount = 3},
-            new ProductOrder() { ProductId = 2, OrderId = 1, Amount = 5},
-            new ProductOrder() { ProductId = 3, OrderId = 1, Amount = 8},
-            new ProductOrder() { ProductId = 3, OrderId = 2, Amount = 1},
-            new ProductOrder() { ProductId = 2, OrderId = 2, Amount = 2},
-            new ProductOrder() { ProductId = 3, OrderId = 3, Amount = 8},
-            new ProductOrder() { ProductId = 1, OrderId = 3, Amount = 12},
+            new TicketConcert() { Id = 1, TicketId = 1, ConcertId = 1, Price = 100.00},
+            new TicketConcert() { Id = 2, TicketId = 2, ConcertId = 2, Price = 150.00},
+            new TicketConcert() { Id = 3, TicketId = 3, ConcertId = 3, Price = 200.00}
         });
     }
 }
