@@ -6,19 +6,19 @@ public class OrderDto
     public DateTime CreatedAt { get; set; }
     public DateTime? FulfilledAt { get; set; }
     public string Status { get; set; } = null!;
-    public ClientInfoDto Client { get; set; } = null!;
-    public List<OrderLineItemDto> Products { get; set; } = null!;
+    public ClientDto ClientDto { get; set; } = null!;
+    public List<ProductDto> Products { get; set; } = null!;
 }
 
-public class ClientInfoDto
+public class ClientDto
 {
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
 }
 
-public class OrderLineItemDto
+public class ProductDto
 {
-    public string Name { get; set; } = null!;
+    public string ProductName { get; set; } = null!;
     public double Price { get; set; }
     public int Amount { get; set; }
 }
